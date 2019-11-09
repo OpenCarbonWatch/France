@@ -148,6 +148,9 @@ for i in range(organizations.shape[0]):
     else:
         if is_city(type_id):
             organizations.at[i, 'is_concerned'] = organizations.at[i, 'city_id'] in large_cities['CODGEO'].tolist()
+            # City of Marseille is large but population is split by arrondissements. Force Marseille in our list.
+            if organizations.at[i, 'id'] in ['211300553']:
+                organizations.at[i, 'is_concerned'] = True
         elif is_city_group(type_id):
             organizations.at[i, 'is_concerned'] = organizations.at[i, 'id'] in large_groups['EPCI'].tolist()
         else:
@@ -156,4 +159,4 @@ for i in range(organizations.shape[0]):
 organizations = organizations[organizations['is_concerned']]
 organizations = organizations[['id', 'name', 'staff', 'city_id',
                                'is_private', 'type_id', 'type_label_1', 'type_label_2', 'type_label_3']]
-organizations.to_csv('organizations.csv', index=False, encoding='UTF-8')
+organizations.to_csv('../data/output/organizations.csv', index=False, encoding='UTF-8')

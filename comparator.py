@@ -1,6 +1,6 @@
 import pandas as pd
 
-organizations = pd.read_csv('organizations.csv', dtype=str)
+organizations = pd.read_csv('../data/output/organizations.csv', dtype=str)
 assessments = pd.read_csv('../data/BEGES/assessments.csv', dtype=str)
 legal_units = pd.read_csv('../data/BEGES/legal_units.csv', dtype=str)
 
@@ -8,7 +8,6 @@ legal_units = pd.read_csv('../data/BEGES/legal_units.csv', dtype=str)
 
 links = pd.read_csv('links.csv', dtype=str)
 legal_units = legal_units.append(links, ignore_index=True)
-
 
 # Filter partial assessments
 
