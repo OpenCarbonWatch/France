@@ -13,7 +13,8 @@ def is_concerned(some_type_id):
     # 1: Natural persons
     # 2: Organizations with no moral personality
     # 7190: "Ecole nationale non dotée de la personnalité morale"
-    return (len(some_type_id) == 4) and not (some_type_id[0] in ['1', '2']) and not (some_type_id == '7190')
+    # 7312: "Commune associée" > the main city will do the reporting
+    return (len(some_type_id) == 4) and not (some_type_id[0] in ['1', '2']) and not (some_type_id in ['7190', '7312'])
 
 
 def is_private(some_type_id):

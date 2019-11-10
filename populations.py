@@ -10,7 +10,11 @@ input_path = '../data/INSEE/'
 output_path = '../data/output/'
 
 # Load data
-populations = pd.read_csv(input_path + 'Communes.csv', encoding='UTF-8', dtype='str')
+populations_main = pd.read_csv(input_path + 'Communes.csv', encoding='UTF-8', dtype='str')
+populations_main = populations_main[['Code département', 'Code commune', pop_field]]
+populations_mayotte = pd.read_csv('mayotte_2017.csv', encoding='UTF-8', dtype='str')
+populations_mayotte = populations_mayotte[['Code département', 'Code commune', pop_field]]
+populations = populations_main.append(populations_mayotte, ignore_index=True)
 compositions = pd.read_csv(input_path + 'Composition_communale.csv', encoding='UTF-8')
 
 if not os.path.exists(output_path):
