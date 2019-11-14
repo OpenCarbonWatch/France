@@ -24,6 +24,10 @@ des régions, départements, communes, intercommunalités et autres collectivit�
 
 ### Liste des personnes morales
 
-* Créer un dossier `data/SIRENE`avec les fichiers CSV issus de
+* Créer un dossier `data/SIRENE` avec les fichiers CSV issus de
 https://www.data.gouv.fr/fr/datasets/base-sirene-des-entreprises-et-de-leurs-etablissements-siren-siret/
 
+### Liste des bilans GES ADEME
+
+* Créer un dossier `data/BEGES` avec les fichiers `assessments.csv` et `legal_units.csv` de
+https://www.data.gouv.fr/fr/datasets/bilans-demissions-de-ges-publies-sur-le-site-de-lademe-1/
