@@ -1,39 +1,67 @@
 import csv
+import os
 import pandas as pd
 
-size = 100000
-max = 1000
+# Directories
 
-large_cities = pd.read_csv('../data/output/large_cities.csv', dtype=str)
-large_groups = pd.read_csv('../data/output/large_groups.csv', dtype=str)
+input_path = '../data/SIRENE/'
+output_path = '../data/output/'
+
+if not os.path.exists(output_path):
+    os.mkdir(output_path)
+
+filename_legal_units = input_path + 'StockUniteLegale_utf8.csv'
+filename_establishments = input_path + 'StockEtablissement_utf8.csv'
+
+populations = pd.read_csv(output_path + 'populations.csv', dtype=str)
+
+log_chunk_size = 1000000
+
+# Utility functions
+
+
+class Organization:
+
+    def __init__(self, id, name, type_id):
+        self.id = id
+        self.name = name
+        self.type_id = type_id
+        self.min_staff_1 = 0
+        self.min_staff_2 = 0
+        self.max_staff_1 = None
+        self.max_staff_2 = 0
+        self.population = 0
+        self.city_id = None
+        self.active = False
 
 
 def is_concerned(some_type_id):
     # Keep only organizations of which the type is known, and exclude
     # 1: Natural persons
     # 2: Organizations with no moral personality
-    # 7190: "Ecole nationale non dotée de la personnalité morale"
+    # 7190: "Ecole nationale non dotée de la personnalité morale" > we only want juridical persons
     # 7312: "Commune associée" > the main city will do the reporting
-    return (len(some_type_id) == 4) and not (some_type_id[0] in ['1', '2']) and not (some_type_id in ['7190', '7312'])
+    # 7225: "Collectivité et territoire d'Outre Mer" > follow local legislation
+    return (len(some_type_id) == 4) and not (some_type_id[0] in ['1', '2']) and not (some_type_id in ['7190', '7225', '7312'])
 
 
 def is_private(some_type_id):
     return some_type_id[0] in ['3', '5', '6', '8', '9']
 
 
-def is_large(some_type_id):
-    return some_type_id in ['7220', '7229', '7230']
+def is_population_based(some_type_id):
+    return some_type_id in ['7210', '7220', '7229', '7230', '7343', '7344', '7346', '7348']
 
 
 def is_city(some_type_id):
-    return some_type_id in ['7210']
+    return some_type_id == '7210'
 
 
-def is_city_group(some_type_id):
-    return some_type_id in ['7343', '7344', '7346', '7348']
+def is_department(some_type_id):
+    return some_type_id == '7220'
 
 
-def get_staff(staff_code):
+def get_min_staff(staff_code):
     staff_codes = {
         '': 0,
         'NN': 0,
@@ -56,9 +84,46 @@ def get_staff(staff_code):
     return staff_codes[staff_code]
 
 
+def get_max_staff(staff_code):
+    staff_codes = {
+        '': None,
+        'NN': 0,
+        '00': 0,
+        '01': 2,
+        '02': 5,
+        '03': 9,
+        '11': 19,
+        '12': 49,
+        '21': 99,
+        '22': 199,
+        '31': 249,
+        '32': 499,
+        '41': 999,
+        '42': 1999,
+        '51': 4999,
+        '52': 9999,
+        '53': None
+    }
+    return staff_codes[staff_code]
+
+
+def staff_max_sum(a, b):
+    if a is None or b is None:
+        return None
+    return a + b
+
+
+def staff_max_min(a, b):
+    if a is None:
+        return b
+    if b is None:
+        return a
+    return min(a, b)
+
+
 print('INFO: Processing legal units file (~ 21M records).')
 organizations = {}
-with open('../data/SIRENE/StockUniteLegale_utf8.csv', 'r', encoding='UTF-8') as input_file:
+with open(filename_legal_units, 'r', encoding='UTF-8') as input_file:
     index = 0
     for line in input_file:
         if index == 0:
@@ -74,36 +139,27 @@ with open('../data/SIRENE/StockUniteLegale_utf8.csv', 'r', encoding='UTF-8') as 
             type_id = cells[header['categorieJuridiqueUniteLegale']]
             if active == 'A' and is_concerned(type_id):
                 code = cells[header['siren']]
-                staff = get_staff(cells[header['trancheEffectifsUniteLegale']])
-                concerned = False
-                if is_private(type_id):
-                    concerned = staff >= 250
-                else:
-                    if is_city(type_id) or is_city_group(type_id):
-                        concerned = True
-                    elif is_large(type_id):
-                        concerned = True
-                    else:
-                        concerned = staff >= 250
-                # Exclude overseas particular cases
-                # > TERRITOIRE DE NOUVELLE-CALEDONIE
-                # > CONSEIL TERRITORIAL ST BARTHELEMY
-                # > PROVINCE DES ILES
-                if concerned and not (code in ['229880018', '200015816', '200012979']):
-                    organizations[code] = ({
-                        'type_id': type_id,
-                        'id': code,
-                        'name': cells[header['denominationUniteLegale']],
-                        'staff': staff,
-                    })
+                name = cells[header['denominationUniteLegale']]
+                org = Organization(code, name, type_id)
+                org.min_staff_1 = get_min_staff(cells[header['trancheEffectifsUniteLegale']])
+                org.max_staff_1 = get_max_staff(cells[header['trancheEffectifsUniteLegale']])
+                organizations[code] = org
             index += 1
-            if index % (1 * size) == 0:
-                if index > max * size:
+            if index % log_chunk_size == 0:
+                if index >= 100 * log_chunk_size:
                     break
                 print(index)
 
+print('INFO: Preparing population by organization id.')
+population_dict = {}
+for i in range(populations.shape[0]):
+    id = populations.at[i, 'id']
+    value = populations.at[i, 'population']
+    type_id = populations.at[i, 'legal_unit_type_id']
+    population_dict[type_id + '|' + id] = int(value)
+
 print('INFO: Processing sites file (~ 29M records).')
-with open('../data/SIRENE/StockEtablissement_utf8.csv', encoding='UTF-8') as input_file:
+with open(filename_establishments, encoding='UTF-8') as input_file:
     index = 0
     for line in input_file:
         if index == 0:
@@ -117,47 +173,73 @@ with open('../data/SIRENE/StockEtablissement_utf8.csv', encoding='UTF-8') as inp
                 cells = list(csv.reader([line]))[0]
             code = cells[header['siren']]
             if code in organizations:
-                if cells[header['etablissementSiege']] == 'true' and cells[header['etatAdministratifEtablissement']] == 'A':
-                    org = organizations[code]
-                    org['city_id'] = cells[header['codeCommuneEtablissement']]
-                    organizations[code] = org
+                org = organizations[code]
+                if cells[header['etatAdministratifEtablissement']] == 'A':
+                    org.active = True
+                    org.min_staff_2 = org.min_staff_2 + get_min_staff(cells[header['trancheEffectifsEtablissement']])
+                    org.max_staff_2 = staff_max_sum(org.max_staff_2, get_max_staff(cells[header['trancheEffectifsEtablissement']]))
+                if cells[header['etablissementSiege']] == 'true':
+                    city_id = cells[header['codeCommuneEtablissement']]
+                    if cells[header['etatAdministratifEtablissement']] == 'A' or org.city_id == '':
+                        org.city_id = city_id
+                        if is_population_based(org.type_id):
+                            if is_department(org.type_id):
+                                department_code = city_id[:3] if city_id.startswith('97') else city_id[:2]
+                                pop_id = org.type_id + '|' + department_code
+                            elif is_city(org.type_id):
+                                # For Lyon and Marseille, redirect city hall code to city code
+                                if city_id == '69381':
+                                    city_id = '69123'
+                                if city_id == '13202':
+                                    city_id = '13055'
+                                pop_id = org.type_id + '|' + city_id
+                            else:
+                                pop_id = org.type_id + '|' + org.id
+                            if pop_id in population_dict:
+                                org.population = population_dict[pop_id]
+                organizations[code] = org
             index += 1
-            if index % (1 * size) == 0:
-                if index > max * size:
+            if index % log_chunk_size == 0:
+                if index >= 100 * log_chunk_size:
                     break
                 print(index)
 
 legal_unit_types = pd.read_csv('legal_unit_types.csv', encoding='UTF-8', dtype=str)
 
-organizations = list(organizations.values())
-organizations = pd.DataFrame.from_dict(organizations, dtype=str)
-organizations = organizations.merge(legal_unit_types, how='left', left_on='type_id', right_on='type_id')
-organizations = organizations.fillna('')
-organizations['staff'] = pd.to_numeric(organizations['staff'])
+# SIREN codes for 6 cities part of the "Zone Rouge" in Meuse departement, with 0 population
+zone_rouge = ['215502394', '215500398', '215500505', '215503079', '215501891', '215501396']
+# SIREN codes of city groups which are closed, but have not yet been removed from the SIRENE database
+old_groups = ['200000776', '244200846', '200034676', '243301173', '244200721', '248300584', '248600421', '242010098',
+              '244200812', '200035665', '242700623']
 
-organizations['is_concerned'] = False
-organizations['is_private'] = False
-for i in range(organizations.shape[0]):
-    type_id = organizations.at[i, 'type_id']
-    organizations.at[i, 'is_private'] = is_private(type_id)
-    if is_private(type_id):
-        city_id = organizations.at[i, 'city_id']
-        if len(city_id) == 5 and city_id[:2] in ['96', '97', '98', '99']:
-            organizations.at[i, 'is_concerned'] = organizations.at[i, 'staff'] >= 250
-        else:
-            organizations.at[i, 'is_concerned'] = organizations.at[i, 'staff'] >= 500
-    else:
-        if is_city(type_id):
-            organizations.at[i, 'is_concerned'] = organizations.at[i, 'city_id'] in large_cities['CODGEO'].tolist()
-            # City of Marseille is large but population is split by arrondissements. Force Marseille in our list.
-            if organizations.at[i, 'id'] in ['211300553']:
-                organizations.at[i, 'is_concerned'] = True
-        elif is_city_group(type_id):
-            organizations.at[i, 'is_concerned'] = organizations.at[i, 'id'] in large_groups['EPCI'].tolist()
-        else:
-            organizations.at[i, 'is_concerned'] = True
+all = organizations.values()
+organizations = []
+for org in all:
+    overseas = ['975', '977', '978', '984', '986', '987', '988', '989']
+    keep = True
+    if (org.id in zone_rouge) or (org.id in old_groups):
+        keep = False
+    if not org.active:
+        keep = False
+    # Exclude overseas-based organizations
+    for code in overseas:
+        if org.city_id is not None and org.city_id.startswith(code):
+            keep = False
+    # Created on 2019-09-01 by merging two previous entities
+    if org.id == '200089456':
+        org.population = 105738
+    if not (org.type_id.startswith('7') or org.type_id.startswith('4')):
+        keep = False
+    if keep:
+        organizations.append(org)
+        if is_population_based(org.type_id) and org.population == 0:
+            print('WARNING: No population found for ' + str(org.id))
 
-organizations = organizations[organizations['is_concerned']]
-organizations = organizations[['id', 'name', 'staff', 'city_id',
-                               'is_private', 'type_id', 'type_label_1', 'type_label_2', 'type_label_3']]
-organizations.to_csv('../data/output/organizations.csv', index=False, encoding='UTF-8')
+with open('../data/output/organizations.csv', 'w', encoding='UTF-8') as file:
+    file.write('id,name,min_staff,max_staff,population,city_id,type_id\n')
+    for org in organizations:
+        ms = staff_max_min(org.max_staff_1, org.max_staff_2)
+        ms = '' if ms is None else str(ms)
+        file.write('%s,"%s",%d,%s,%d,%s,%s\n' % (org.id, org.name,
+                                                 max(org.min_staff_1, org.min_staff_2), ms,
+                                                 org.population, org.city_id, org.type_id))
