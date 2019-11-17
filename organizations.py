@@ -33,6 +33,7 @@ class Organization:
         self.population = 0
         self.city_id = None
         self.active = False
+        self.regulation = None
 
 
 def is_concerned(some_type_id):
@@ -235,11 +236,28 @@ for org in all:
         if is_population_based(org.type_id) and org.population == 0:
             print('WARNING: No population found for ' + str(org.id))
 
+# Determine regulation
+for org in organizations:
+    if is_private(org.type_id):
+        if org.city_id is not None and (not org.city_id.startswith('97')) and (max(org.min_staff_1, org.min_staff_2) >= 500):
+            org.regulation = 1
+        if org.city_id is not None and (org.city_id.startswith('97')) and (max(org.min_staff_1, org.min_staff_2) >= 250):
+            org.regulation = 2
+    else:
+        if org.type_id.startswith('71'):
+            org.regulation = 3
+        elif is_population_based(org.type_id):
+            if org.population >= 50000:
+                org.regulation = 4
+        elif max(org.min_staff_1, org.min_staff_2) >= 250:
+            org.regulation = 5
+
 with open('../data/output/organizations.csv', 'w', encoding='UTF-8') as file:
-    file.write('id,name,min_staff,max_staff,population,city_id,type_id\n')
+    file.write('id,name,min_staff,max_staff,population,city_id,type_id,regulation\n')
     for org in organizations:
         ms = staff_max_min(org.max_staff_1, org.max_staff_2)
         ms = '' if ms is None else str(ms)
-        file.write('%s,"%s",%d,%s,%d,%s,%s\n' % (org.id, org.name,
+        regulation = '' if org.regulation is None else str(org.regulation)
+        file.write('%s,"%s",%d,%s,%d,%s,%s,%s\n' % (org.id, org.name,
                                                  max(org.min_staff_1, org.min_staff_2), ms,
-                                                 org.population, org.city_id, org.type_id))
+                                                 org.population, org.city_id, org.type_id, regulation))
