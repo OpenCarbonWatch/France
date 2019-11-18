@@ -181,7 +181,9 @@ with open(filename_establishments, encoding='UTF-8') as input_file:
                     org.max_staff_2 = staff_max_sum(org.max_staff_2, get_max_staff(cells[header['trancheEffectifsEtablissement']]))
                 if cells[header['etablissementSiege']] == 'true':
                     city_id = cells[header['codeCommuneEtablissement']]
-                    if cells[header['etatAdministratifEtablissement']] == 'A' or org.city_id == '':
+                    if len(city_id) != 5:
+                        city_id = None
+                    if (city_id is not None) and (cells[header['etatAdministratifEtablissement']] == 'A' or org.city_id is None):
                         org.city_id = city_id
                         if is_population_based(org.type_id):
                             if is_department(org.type_id):
@@ -229,8 +231,6 @@ for org in all:
     # Created on 2019-09-01 by merging two previous entities
     if org.id == '200089456':
         org.population = 105738
-    if not (org.type_id.startswith('7') or org.type_id.startswith('4')):
-        keep = False
     if keep:
         organizations.append(org)
         if is_population_based(org.type_id) and org.population == 0:
@@ -245,7 +245,9 @@ for org in organizations:
             org.regulation = 2
     else:
         if org.type_id.startswith('71'):
-            org.regulation = 3
+            # City is not defined for state services that are installed abroad (e.g. ambassies in foreign countries)
+            if org.city_id is not None:
+                org.regulation = 3
         elif is_population_based(org.type_id):
             if org.population >= 50000:
                 org.regulation = 4
@@ -253,11 +255,11 @@ for org in organizations:
             org.regulation = 5
 
 with open('../data/output/organizations.csv', 'w', encoding='UTF-8') as file:
-    file.write('id,name,min_staff,max_staff,population,city_id,type_id,regulation\n')
+    file.write('id,name,min_staff,max_staff,population,city_id,organization_type_id,regulation\n')
     for org in organizations:
         ms = staff_max_min(org.max_staff_1, org.max_staff_2)
         ms = '' if ms is None else str(ms)
         regulation = '' if org.regulation is None else str(org.regulation)
-        file.write('%s,"%s",%d,%s,%d,%s,%s,%s\n' % (org.id, org.name,
+        file.write('%s,"%s",%d,%s,%d,%s,%s,%s\n' % (org.id, org.name.replace('"', '""'),
                                                  max(org.min_staff_1, org.min_staff_2), ms,
                                                  org.population, org.city_id, org.type_id, regulation))
