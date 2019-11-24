@@ -16,6 +16,7 @@ links.to_csv('../data/output/assessment_organization.csv', index=False, encoding
 assessments = pd.read_csv('../data/BEGES/assessments.csv', dtype=str)
 assessments = assessments[['id', 'reporting_year', 'total_scope_1', 'total_scope_2', 'total_scope_3', 'action_plan',
                            'reductions_scope_1_2', 'reductions_scope_1', 'reductions_scope_2', 'reductions_scope_3',
-                           'source_url']]
+                           'is_draft', 'source_url']]
 assessments['action_plan'] = (assessments['action_plan'] == 'Oui')
+assessments['is_draft'] = (assessments['is_draft'] == 'Oui')
 assessments.to_csv('../data/output/assessments.csv', index=False, encoding='UTF-8')
