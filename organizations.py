@@ -228,9 +228,21 @@ for org in all:
     for code in overseas:
         if org.city_id is not None and org.city_id.startswith(code):
             keep = False
-    # Created on 2019-09-01 by merging two previous entities
+    # Created on 2019-09-01 by merging 2 previous entities
     if org.id == '200089456':
         org.population = 105738
+    # Created on 2019-11-01 by merging 2 previous entities
+    if org.id == '200090561':
+        org.population = 5370 + 34718
+    # Created on 2019-11-01 by merging 4 previous entities
+    if org.id == '200090579':
+        org.population = 7210 + 6283 + 6518 + 6024
+    # Created on 2019-11-01, changed number from previous SIREN
+    if org.id == '200090504':
+        org.population = 75989
+    # Created on 2019-11-01, changed number from previous SIREN
+    if org.id == '200090751':
+        org.population = 104918
     if keep:
         organizations.append(org)
         if is_population_based(org.type_id) and org.population == 0:

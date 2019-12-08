@@ -20,3 +20,8 @@ assessments = assessments[['id', 'reporting_year', 'total_scope_1', 'total_scope
 assessments['action_plan'] = (assessments['action_plan'] == 'Oui')
 assessments['is_draft'] = (assessments['is_draft'] == 'Oui')
 assessments.to_csv('../data/output/assessments.csv', index=False, encoding='UTF-8')
+
+# Reporting on missing matches
+
+missing = assessments[~assessments['id'].isin(links['assessment_id'])]
+missing.to_csv('../data/output/missing.csv', index=False, encoding='UTF-8')
