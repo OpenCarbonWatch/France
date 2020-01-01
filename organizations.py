@@ -212,8 +212,14 @@ legal_unit_types = pd.read_csv('legal_unit_types.csv', encoding='UTF-8', dtype=s
 # SIREN codes for 6 cities part of the "Zone Rouge" in Meuse departement, with 0 population
 zone_rouge = ['215502394', '215500398', '215500505', '215503079', '215501891', '215501396']
 # SIREN codes of city groups which are closed, but have not yet been removed from the SIRENE database
-old_groups = ['200000776', '244200846', '200034676', '243301173', '244200721', '248300584', '248600421', '242010098',
-              '244200812', '200035665', '242700623']
+old_groups = ['200000776', '200034676', '242010098', '243301173', '244200721', '244200812', '244200846', '248300584', '248600421']
+
+manual_populations_csv = pd.read_csv('manual_populations.csv', encoding='UTF-8', dtype=str)
+manual_populations_dict = {}
+for i in range(manual_populations_csv.shape[0]):
+    id = manual_populations_csv.at[i, 'organization_id']
+    value = manual_populations_csv.at[i, 'population']
+    manual_populations_dict[id] = int(value)
 
 all = organizations.values()
 organizations = []
@@ -228,21 +234,9 @@ for org in all:
     for code in overseas:
         if org.city_id is not None and org.city_id.startswith(code):
             keep = False
-    # Created on 2019-09-01 by merging 2 previous entities
-    if org.id == '200089456':
-        org.population = 105738
-    # Created on 2019-11-01 by merging 2 previous entities
-    if org.id == '200090561':
-        org.population = 5370 + 34718
-    # Created on 2019-11-01 by merging 4 previous entities
-    if org.id == '200090579':
-        org.population = 7210 + 6283 + 6518 + 6024
-    # Created on 2019-11-01, changed number from previous SIREN
-    if org.id == '200090504':
-        org.population = 75989
-    # Created on 2019-11-01, changed number from previous SIREN
-    if org.id == '200090751':
-        org.population = 104918
+    # Use manual populations if provided
+    if org.id in manual_populations_dict:
+        org.population = manual_populations_dict[org.id]
     if keep:
         organizations.append(org)
         if is_population_based(org.type_id) and org.population == 0:
