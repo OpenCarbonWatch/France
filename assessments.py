@@ -23,5 +23,6 @@ assessments.to_csv('../data/output/assessments.csv', index=False, encoding='UTF-
 
 # Reporting on missing matches
 
-missing = assessments[~assessments['id'].isin(links['assessment_id'])]
-missing.to_csv('../data/output/missing.csv', index=False, encoding='UTF-8')
+missing = assessments[~ assessments['id'].isin(links['assessment_id'])]
+missing = missing[~ missing['is_draft']]
+missing.to_csv('../data/output/missing.csv', index=False, sep=';', encoding='UTF-8')
