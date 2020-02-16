@@ -29,4 +29,4 @@ good['ratio'] = good['reductions'] / good['total']
 good = good[good['ratio'] >= 0.05].copy()
 good = good[good['ratio'] <= 0.33].copy()
 
-good.to_csv(output_path + 'good.csv', sep=';', index=False, encoding='Windows-1252')
+good.to_csv(output_path + 'good.csv', sep=';', index=False, encoding='UTF-8')
