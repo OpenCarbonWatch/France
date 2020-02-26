@@ -144,6 +144,7 @@ with open(filename_legal_units, 'r', encoding='UTF-8') as input_file:
                 org = Organization(code, name, type_id)
                 org.min_staff_1 = get_min_staff(cells[header['trancheEffectifsUniteLegale']])
                 org.max_staff_1 = get_max_staff(cells[header['trancheEffectifsUniteLegale']])
+                org.activity_id = cells[header['activitePrincipaleUniteLegale']]
                 organizations[code] = org
             index += 1
             if index % log_chunk_size == 0:
@@ -156,7 +157,7 @@ population_dict = {}
 for i in range(populations.shape[0]):
     id = populations.at[i, 'id']
     value = populations.at[i, 'population']
-    type_id = populations.at[i, 'legal_unit_type_id']
+    type_id = populations.at[i, 'legal_type_id']
     population_dict[type_id + '|' + id] = int(value)
 
 print('INFO: Processing sites file (~ 29M records).')
@@ -206,8 +207,6 @@ with open(filename_establishments, encoding='UTF-8') as input_file:
                 if index >= 100 * log_chunk_size:
                     break
                 print(index)
-
-legal_unit_types = pd.read_csv('legal_unit_types.csv', encoding='UTF-8', dtype=str)
 
 # SIREN codes for 6 cities part of the "Zone Rouge" in Meuse departement, with 0 population
 zone_rouge = ['215502394', '215500398', '215500505', '215503079', '215501891', '215501396']
@@ -261,11 +260,11 @@ for org in organizations:
             org.regulation = 5
 
 with open('../data/output/organizations.csv', 'w', encoding='UTF-8') as file:
-    file.write('id,name,min_staff,max_staff,population,city_id,organization_type_id,regulation\n')
+    file.write('id,name,min_staff,max_staff,population,city_id,legal_type_id,regulation,activity_id\n')
     for org in organizations:
         ms = staff_max_min(org.max_staff_1, org.max_staff_2)
         ms = '' if ms is None else str(ms)
         regulation = '' if org.regulation is None else str(org.regulation)
-        file.write('%s,"%s",%d,%s,%d,%s,%s,%s\n' % (org.id, org.name.replace('"', '""'),
+        file.write('%s,"%s",%d,%s,%d,%s,%s,%s,%s\n' % (org.id, org.name.replace('"', '""'),
                                                  max(org.min_staff_1, org.min_staff_2), ms,
-                                                 org.population, org.city_id, org.type_id, regulation))
+                                                 org.population, org.city_id, org.type_id, regulation, org.activity_id))
