@@ -211,7 +211,7 @@ with open(filename_establishments, encoding='UTF-8') as input_file:
 # SIREN codes for 6 cities part of the "Zone Rouge" in Meuse departement, with 0 population
 zone_rouge = ['215502394', '215500398', '215500505', '215503079', '215501891', '215501396']
 # SIREN codes of city groups which are closed, but have not yet been removed from the SIRENE database
-old_groups = ['200000776', '200034676', '242010098', '243301173', '244200721', '244200812', '244200846', '248300584', '248600421']
+old_groups = ['200000776', '200034676', '242010098', '243301173', '248300584', '248600421', '200093201']
 
 manual_populations_csv = pd.read_csv('manual_populations.csv', encoding='UTF-8', dtype=str)
 manual_populations_dict = {}

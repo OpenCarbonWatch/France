@@ -10,7 +10,7 @@ if not os.path.exists(output_path):
     os.mkdir(output_path)
 
 filename_populations = input_path + 'ensemble.xls'
-filename_compositions = input_path + 'Intercommunalité - Métropole au 01-01-2019.xls'
+filename_compositions = input_path + 'Intercommunalité - Métropole au 01-01-2020.xlsx'
 
 # See the page https://www.ecologique-solidaire.gouv.fr/actions-des-entreprises-et-des-collectivites-climat
 # which clearly states that the legal population to be taken into account is the total one.
@@ -90,7 +90,6 @@ groups = groups[groups['NATURE_EPCI'] != 'ZZ'].copy()
 groups['id'] = groups['EPCI']
 groups['legal_type_id'] = groups['NATURE_EPCI'].map(lambda x: LEGAL_TYPE_CITY_GROUP[x])
 groups['legal_type_id'][groups['id'] == '200046977'] = LEGAL_TYPE_OTHER_TERRITORIAL_COLLECTIVITY  # Lyon has a special status
-groups['legal_type_id'][groups['id'] == '242500361'] = LEGAL_TYPE_CITY_GROUP['CU']  # "Grand Besançon" was a CA, became CU on 2019-07-01
 
 compositions = pd.read_excel(filename_compositions, sheet_name='Composition_communale', skiprows=5, converters={col: str for col in range(6)})
 compositions = compositions.merge(cities, how='left', left_on='CODGEO', right_on='id')
@@ -102,4 +101,5 @@ groups = groups.merge(compositions, how='left')
 
 populations = populations.append(groups, ignore_index=True, sort=True)
 populations = populations[['legal_type_id', 'id', 'population']]
+populations['population'] = populations['population'].map(lambda x: str(int(x)))
 populations.to_csv(output_path + 'populations.csv', index=False, encoding='UTF-8')
