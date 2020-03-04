@@ -6,6 +6,7 @@ links_ademe = pd.read_csv('../data/BEGES/legal_units.csv', dtype=str)
 links_ademe = links_ademe[links_ademe['legal_unit_id_type'] == 'SIREN']
 del links_ademe['legal_unit_id_type']
 links_ademe = links_ademe.rename(columns={'legal_unit_id': 'organization_id'})
+links_ademe = links_ademe[links_ademe['assessment_id'] != '4787'] # Prefecture du Finistere refers to the wrong SIRET in this assessment. We override it in our manual file.
 links_ademe = links_ademe[['organization_id', 'assessment_id']].copy()
 links_manual = pd.read_csv('manual_assessment_organization.csv', dtype=str)
 links = links_manual.append(links_ademe, ignore_index=True)
