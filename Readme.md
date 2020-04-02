@@ -1,6 +1,12 @@
-## France
+# France
 
 ## Mode d'emploi
+
+### Téléchargements automatisés
+
+Lancer le script `downloads.py` . Celui-ci crée un sous-dossier `data` dans lequel il télécharge :
+* les unités légales et les établissements de la [base Sirene](https://www.data.gouv.fr/fr/datasets/base-sirene-des-entreprises-et-de-leurs-etablissements-siren-siret/) de l'INSEE,
+* les [bilans d'émissions de gaz à effet de serre](https://www.data.gouv.fr/fr/datasets/bilans-demissions-de-ges-publies-sur-le-site-de-lademe-1/) publiés via l'ADEME.
 
 ### Calcul des populations légales
 
@@ -13,21 +19,10 @@ https://www.insee.fr/fr/statistiques/fichier/2510634/Intercommunalite-Metropole_
   * un fichier `ensemble.xls` reprenant les populations légales 2016 de l'INSEE, téléchargé depuis
 https://www.insee.fr/fr/statistiques/fichier/3677785/ensemble.xls
 
-Le fichier `mayotte_2017.csv` a été construit à partir des données de populations légales 2017 de Mayotte produites par
-l'INSEE et disponibles sur la page https://www.insee.fr/fr/statistiques/3291775.
+* Exécuter le script `populations.py`, qui construit un fichier `output/populations.csv` avec les populations légales des régions, départements, communes, intercommunalités et autres collectivités territoriales.
 
-Le fichier `regions_siren.csv` a été construit manuellement. Il donne la correspondance entre les codes des régions et
-le numéro SIREN de la personne morale associée.
+### Notes 
 
-* Exécuter le script `populations.py`, qui construit un fichier `output/populations.csv` avec les populations légales
-des régions, départements, communes, intercommunalités et autres collectivités territoriales.
+Le fichier `mayotte_2017.csv` a été construit à partir des données de populations légales 2017 de Mayotte produites par l'INSEE et disponibles sur la page https://www.insee.fr/fr/statistiques/3291775.
 
-### Liste des personnes morales
-
-* Créer un dossier `data/SIRENE` avec les fichiers CSV issus de
-https://www.data.gouv.fr/fr/datasets/base-sirene-des-entreprises-et-de-leurs-etablissements-siren-siret/
-
-### Liste des bilans GES ADEME
-
-* Créer un dossier `data/BEGES` avec les fichiers `assessments.csv` et `legal_units.csv` de
-https://www.data.gouv.fr/fr/datasets/bilans-demissions-de-ges-publies-sur-le-site-de-lademe-1/
+Le fichier `regions_siren.csv` a été construit manuellement. Il donne la correspondance entre les codes des régions et le numéro SIREN de la personne morale associée.

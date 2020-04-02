@@ -4,8 +4,8 @@ import pandas as pd
 
 # Directories
 
-input_path = '../data/SIRENE/'
-output_path = '../data/output/'
+input_path = './data/'
+output_path = './output/'
 
 if not os.path.exists(output_path):
     os.mkdir(output_path)
@@ -259,7 +259,7 @@ for org in organizations:
         elif max(org.min_staff_1, org.min_staff_2) >= 250:
             org.regulation = 5
 
-with open('../data/output/organizations.csv', 'w', encoding='UTF-8') as file:
+with open(output_path + 'organizations.csv', 'w', encoding='UTF-8') as file:
     file.write('id,name,min_staff,max_staff,population,city_id,legal_type_id,regulation,activity_id\n')
     for org in organizations:
         ms = staff_max_min(org.max_staff_1, org.max_staff_2)

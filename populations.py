@@ -3,8 +3,8 @@ import pandas as pd
 
 # Directories
 
-input_path = '../data/INSEE/'
-output_path = '../data/output/'
+input_path = './data/INSEE/'
+output_path = './output/'
 
 if not os.path.exists(output_path):
     os.mkdir(output_path)
