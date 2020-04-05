@@ -20,10 +20,10 @@ Exécuter le script `download_data.py` . Celui-ci crée un sous-dossier `data` d
 ### Consolidation
 
 * Exécuter le script `populations.py` qui construit un fichier `output/populations.csv` avec les populations légales des régions, départements, communes, intercommunalités et autres collectivités territoriales. Ces populations sont utilisées pour déterminer les collectivités territoriales concernées par l'obligation de réaliser et publier leur bilan.
-* Exécuter le script `organizations.csv` qui construit un fichier `output/organizations.csv` avec les données sur les personnes morales nécessaires à la suite du traitement.
-* Exécuter le script `assessments.csv` qui consolide les bilans publiés.
+* Exécuter le script `organizations.py` qui construit un fichier `output/organizations.csv` avec les données sur les personnes morales nécessaires à la suite du traitement.
+* Exécuter le script `assessments.py` qui consolide les bilans publiés.
 
-### Notes 
+## Notes 
 
 Le fichier `manual_assessment_organization.csv` a été construit manuellement. Il donne les liens entre un numéro de bilan d'émissions (identifiant sur le site de l'ADEME) et un numéro SIREN de l'organisation à laquelle il correspond. C'est un travail conséquent (environ 300 correspondances) qui provient d'une interprétation reposant sur le nom de l'entité ayant soumis le bilan. Il peut contenir des erreurs (ouvrir un ticket pour nous l'indiquer). Sur la plateforme de l'ADEME, la saisie d'un numéro SIREN n'est notamment pas obligatoire pour les services de l'Etat, qui sont donc sur-représentés dans ce fichier.
 
