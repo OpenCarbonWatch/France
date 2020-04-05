@@ -22,11 +22,12 @@ print("Total number of new published assessments: %d." % new_assessments.shape[0
 # Look for high quality new assessments
 
 good = new_assessments
-good = good[good['total_scope_3'] > 0].copy()
 good['total'] = good['total_scope_1'] + good['total_scope_2'] + good['total_scope_3']
 good['reductions'] = good.fillna(0)['reductions_scope_1_2'] + good.fillna(0)['reductions_scope_1'] + good.fillna(0)['reductions_scope_2'] + good.fillna(0)['reductions_scope_3']
 good['ratio'] = good['reductions'] / good['total']
-good = good[good['ratio'] >= 0.05].copy()
-good = good[good['ratio'] <= 0.33].copy()
+good['is_good'] = True
+good.loc[good['total_scope_3'] <= 0, 'is_good'] = False
+good.loc[good['ratio'] < 0.05, 'is_good'] = False
+good.loc[good['ratio'] > 0.33, 'is_good'] = False
 
-good.to_csv(output_path + 'good.csv', sep=';', index=False, encoding='UTF-8')
+good.to_excel(output_path + 'new.xlsx', index=False)
