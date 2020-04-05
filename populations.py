@@ -67,7 +67,7 @@ departments['legal_type_id'] = LEGAL_TYPE_DEPARTMENT
 
 regions = pd.read_excel(filename_populations, sheet_name='Régions', skiprows=7, converters={col: str for col in range(7)})
 regions = regions[['Code région', pop_field]]
-regions_codes = pd.read_csv('regions_siren.csv', encoding='UTF-8', dtype=str)
+regions_codes = pd.read_csv('manual_regions_siren.csv', encoding='UTF-8', dtype=str)
 regions = regions.merge(regions_codes, how='left', on='Code région')
 regions = regions.rename(columns={'SIREN': 'id', pop_field: 'population'})
 regions = regions[['id', 'population']]
