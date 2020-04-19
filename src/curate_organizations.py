@@ -4,8 +4,9 @@ import pandas as pd
 
 # Directories
 
-input_path = './data/'
-output_path = './output/'
+data_path = '../data/'
+input_path = '../input/'
+output_path = '../output/'
 
 if not os.path.exists(output_path):
     os.mkdir(output_path)
@@ -213,7 +214,7 @@ zone_rouge = ['215502394', '215500398', '215500505', '215503079', '215501891', '
 # SIREN codes of city groups which are closed, but have not yet been removed from the SIRENE database
 old_groups = ['200000776', '200034676', '242010098', '243301173', '248300584', '248600421', '200093201']
 
-manual_populations_csv = pd.read_csv('manual_populations.csv', encoding='UTF-8', dtype=str)
+manual_populations_csv = pd.read_csv(data_path + 'manual_populations.csv', encoding='UTF-8', dtype=str)
 manual_populations_dict = {}
 for i in range(manual_populations_csv.shape[0]):
     id = manual_populations_csv.at[i, 'organization_id']

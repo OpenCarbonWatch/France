@@ -3,14 +3,15 @@ import pandas as pd
 
 # Directories
 
-input_path = './data/INSEE/'
-output_path = './output/'
+data_path = '../data/'
+input_path = '../input/'
+output_path = '../output/'
 
 if not os.path.exists(output_path):
     os.mkdir(output_path)
 
-filename_populations = input_path + 'ensemble.xls'
-filename_compositions = input_path + 'Intercommunalité - Métropole au 01-01-2020.xlsx'
+filename_populations = input_path + 'INSEE/ensemble.xls'
+filename_compositions = input_path + 'INSEE/Intercommunalité - Métropole au 01-01-2020.xlsx'
 
 # See the page https://www.ecologique-solidaire.gouv.fr/actions-des-entreprises-et-des-collectivites-climat
 # which clearly states that the legal population to be taken into account is the total one.
@@ -29,7 +30,7 @@ LEGAL_TYPE_CITY_GROUP = {'CA': '7348', 'CC': '7346', 'CU': '7343', 'ME': '7344'}
 
 cities_main = pd.read_excel(filename_populations, sheet_name='Communes', skiprows=7, converters={col: str for col in range(10)})
 cities_main = cities_main[['Code département', 'Code commune', 'Nom de la commune', 'Nom de la région', pop_field]]
-cities_mayotte = pd.read_csv('mayotte_2017.csv', encoding='UTF-8', dtype='str')
+cities_mayotte = pd.read_csv(data_path + 'mayotte_2017.csv', encoding='UTF-8', dtype='str')
 cities_mayotte = cities_mayotte[['Code département', 'Code commune', 'Nom de la commune', 'Nom de la région', pop_field]]
 cities = cities_main.append(cities_mayotte, ignore_index=True)
 cities = cities.rename(columns={pop_field: 'population'})
@@ -67,7 +68,7 @@ departments['legal_type_id'] = LEGAL_TYPE_DEPARTMENT
 
 regions = pd.read_excel(filename_populations, sheet_name='Régions', skiprows=7, converters={col: str for col in range(7)})
 regions = regions[['Code région', pop_field]]
-regions_codes = pd.read_csv('manual_regions_siren.csv', encoding='UTF-8', dtype=str)
+regions_codes = pd.read_csv(data_path + 'manual_regions_siren.csv', encoding='UTF-8', dtype=str)
 regions = regions.merge(regions_codes, how='left', on='Code région')
 regions = regions.rename(columns={'SIREN': 'id', pop_field: 'population'})
 regions = regions[['id', 'population']]
