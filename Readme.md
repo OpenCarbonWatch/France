@@ -4,7 +4,7 @@ Ce dépôt contient des codes **Python** permettant de consolider les données s
 
 Les données consolidées proviennent essentiellement de l'INSEE, pour la liste des personnes morales (entreprises, collectivités, services de l'état, associations) et leurs caractéristiques, et de l'ADEME, pour les bilans d'émissions publiés par les organisations.
 
-Les données consolidées sont ensuite utilisée dans la section France de notre site : https://opencarbonwatch.org/fr/france.
+Les données consolidées sont ensuite utilisées dans la section France de notre site : https://opencarbonwatch.org/fr/france.
 
 ## Comment aider ?
 
