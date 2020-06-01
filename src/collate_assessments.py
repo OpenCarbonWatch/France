@@ -19,15 +19,14 @@ links.to_csv(output_path + 'assessment_organization.csv', index=False, encoding=
 # Filter columns for assessments
 
 assessments = pd.read_csv(input_path + 'BEGES/assessments.csv', dtype=str)
+assessments = assessments[assessments['is_draft'] == 'Non']
 assessments = assessments[['id', 'reporting_year', 'total_scope_1', 'total_scope_2', 'total_scope_3', 'action_plan',
                            'reductions_scope_1_2', 'reductions_scope_1', 'reductions_scope_2', 'reductions_scope_3',
-                           'is_draft', 'source_url']]
+                           'source_url']]
 assessments['action_plan'] = (assessments['action_plan'] == 'Oui')
-assessments['is_draft'] = (assessments['is_draft'] == 'Oui')
 assessments.to_csv(output_path +  'assessments.csv', index=False, encoding='UTF-8')
 
 # Reporting on missing matches
 
 missing = assessments[~ assessments['id'].isin(links['assessment_id'])]
-missing = missing[~ missing['is_draft']]
 missing.to_csv(output_path + 'missing.csv', index=False, sep=';', encoding='UTF-8')
