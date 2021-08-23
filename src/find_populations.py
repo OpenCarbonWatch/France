@@ -11,7 +11,7 @@ if not os.path.exists(output_path):
     os.mkdir(output_path)
 
 filename_populations = input_path + 'INSEE/ensemble.xls'
-filename_compositions = input_path + 'INSEE/Intercommunalité - Métropole au 01-01-2020.xlsx'
+filename_compositions = input_path + 'INSEE/Intercommunalite-Metropole_au_01-01-2021.xlsx'
 
 # See the page https://www.ecologique-solidaire.gouv.fr/actions-des-entreprises-et-des-collectivites-climat
 # which clearly states that the legal population to be taken into account is the total one.
@@ -81,6 +81,8 @@ populations = populations.append(regions, ignore_index=True, sort=True)
 populations['legal_type_id'][populations['id'] == '200055507'] = LEGAL_TYPE_OTHER_TERRITORIAL_COLLECTIVITY
 populations['legal_type_id'][populations['id'] == '200076958'] = LEGAL_TYPE_OTHER_TERRITORIAL_COLLECTIVITY
 populations['legal_type_id'][populations['id'] == '200052678'] = LEGAL_TYPE_OTHER_TERRITORIAL_COLLECTIVITY
+populations['legal_type_id'][populations['id'] == '976'] = LEGAL_TYPE_OTHER_TERRITORIAL_COLLECTIVITY
+populations['id'][populations['id'] == '976'] = '229850003'
 populations['legal_type_id'][populations['id'] == '75056'] = LEGAL_TYPE_OTHER_TERRITORIAL_COLLECTIVITY
 populations['id'][populations['id'] == '75056'] = '217500016'
 
@@ -91,6 +93,7 @@ groups = groups[groups['NATURE_EPCI'] != 'ZZ'].copy()
 groups['id'] = groups['EPCI']
 groups['legal_type_id'] = groups['NATURE_EPCI'].map(lambda x: LEGAL_TYPE_CITY_GROUP[x])
 groups['legal_type_id'][groups['id'] == '200046977'] = LEGAL_TYPE_OTHER_TERRITORIAL_COLLECTIVITY  # Lyon has a special status
+groups['legal_type_id'][groups['id'] == '200060465'] = '7348' # Grand Nord de Mayotte changed on 2021-01-01 but change is not yet reflected in the composition file
 
 compositions = pd.read_excel(filename_compositions, sheet_name='Composition_communale', skiprows=5, converters={col: str for col in range(6)})
 compositions = compositions.merge(cities, how='left', left_on='CODGEO', right_on='id')

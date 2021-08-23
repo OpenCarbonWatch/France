@@ -37,7 +37,7 @@ if not os.path.exists(file_beges):
     download_file('https://www.data.gouv.fr/fr/datasets/r/c90e1000-d51a-4e7a-9276-f613ea8afea9', file_beges)
     unzip(file_beges, input_path + 'BEGES/')
 
-download_file('https://www.insee.fr/fr/statistiques/fichier/4265429/ensemble.xls', input_path + 'INSEE/ensemble.xls')
-download_file('https://www.insee.fr/fr/statistiques/fichier/2510634/Intercommunalite-Metropole_au_01-01-2020.zip', input_path + 'INSEE/Intercommunalité - Métropole au 01-01-2020.zip')
-unzip(input_path + 'INSEE/Intercommunalité - Métropole au 01-01-2020.zip', input_path + 'INSEE/')
+download_file('https://www.insee.fr/fr/statistiques/fichier/4989724/ensemble.xlsx', input_path + 'INSEE/ensemble.xls')
+download_file('https://www.insee.fr/fr/statistiques/fichier/2510634/Intercommunalite_Metropole_au_01-01-2021.zip', input_path + 'INSEE/Intercommunalite-Metropole_au_01-01-2021.zip')
+unzip(input_path + 'INSEE/Intercommunalite-Metropole_au_01-01-2021.zip', input_path + 'INSEE/')
 download_file('https://www.data.gouv.fr/fr/datasets/r/7bb2184b-88cb-4c6c-a408-5a0081816dcd', input_path + 'INSEE/naf2008-listes-completes-5-niveaux.csv')
