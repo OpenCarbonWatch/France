@@ -17,7 +17,7 @@ Les contributions pour intégrer de nouvelles données pertinentes sont les bien
 Exécuter le script `download_data.py` . Celui-ci crée un sous-dossier `input` dans lequel il télécharge les fichiers déjà disponibles publiquement en *open data* sur des sites de référence :
 * les unités légales et les établissements de la [base Sirene](https://www.data.gouv.fr/fr/datasets/base-sirene-des-entreprises-et-de-leurs-etablissements-siren-siret/) de l'INSEE,
 * la [composition des intercommunalités](https://www.insee.fr/fr/information/2510634) consolidée l'INSEE,
-* les [populations légales par commune](https://www.insee.fr/fr/statistiques/4265429?sommaire=4265511) établies par l'INSEE,
+* les [populations légales par commune](https://www.insee.fr/fr/statistiques/6011070?sommaire=6011075) établies par l'INSEE,
 * la [nomenclature d'activités française (NAF)](https://www.data.gouv.fr/fr/datasets/r/7bb2184b-88cb-4c6c-a408-5a0081816dcd),
 * les [bilans d'émissions de gaz à effet de serre](https://www.data.gouv.fr/fr/datasets/bilans-demissions-de-ges-publies-sur-le-site-de-lademe-1/) publiés via l'ADEME.
 

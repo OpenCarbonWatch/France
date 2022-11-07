@@ -10,8 +10,8 @@ output_path = '../output/'
 if not os.path.exists(output_path):
     os.mkdir(output_path)
 
-filename_populations = input_path + 'INSEE/ensemble.xls'
-filename_compositions = input_path + 'INSEE/Intercommunalite-Metropole_au_01-01-2021.xlsx'
+filename_populations = input_path + 'INSEE/ensemble.xlsx'
+filename_compositions = input_path + 'INSEE/Intercommunalite_Metropole_au_01-01-2022.xlsx'
 
 # See the page https://www.ecologique-solidaire.gouv.fr/actions-des-entreprises-et-des-collectivites-climat
 # which clearly states that the legal population to be taken into account is the total one.
@@ -47,7 +47,7 @@ output_cities = output_cities[['id', 'city_name', 'department_name', 'region_nam
 output_cities.to_csv(output_path + 'cities.csv', index=False, encoding='UTF-8')
 
 # Lyon, Marseille and Paris are split by "arrondissements", so we have to compute their total population by summing
-# other the codes of their parts. We associate the total population to the code of the city.
+# over the codes of their parts. We associate the total population to the code of the city.
 
 cities['id'].replace(regex={
     '132((0[1-9])|(1[0-6]))': '13055',
@@ -93,7 +93,6 @@ groups = groups[groups['NATURE_EPCI'] != 'ZZ'].copy()
 groups['id'] = groups['EPCI']
 groups['legal_type_id'] = groups['NATURE_EPCI'].map(lambda x: LEGAL_TYPE_CITY_GROUP[x])
 groups['legal_type_id'][groups['id'] == '200046977'] = LEGAL_TYPE_OTHER_TERRITORIAL_COLLECTIVITY  # Lyon has a special status
-groups['legal_type_id'][groups['id'] == '200060465'] = '7348' # Grand Nord de Mayotte changed on 2021-01-01 but change is not yet reflected in the composition file
 
 compositions = pd.read_excel(filename_compositions, sheet_name='Composition_communale', skiprows=5, converters={col: str for col in range(6)})
 compositions = compositions.merge(cities, how='left', left_on='CODGEO', right_on='id')
